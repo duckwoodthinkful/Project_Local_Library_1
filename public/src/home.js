@@ -16,15 +16,12 @@ function getBooksBorrowedCount(books)
 // Helper function to make the object have name and count keys
 function remapObject(anObject)
 {
-  const keys=Object.keys(anObject);
-  const values=Object.values(anObject);
   const result = [];
-  for (let i=0; i<keys.length;i++)
+  for (const key in anObject)
   {
-    const name = keys[i];
-    const count = values[i];
-    result.push({name, count});
+    result.push({name: key, count: anObject[key]});
   }
+
   return result;
 }
 
@@ -32,11 +29,10 @@ function remapObject(anObject)
 function getMostCommonGenres(books) 
 {
   let commonGenres = books.reduce(function(count,book){count[book.genre] = (count[book.genre] || 0) + 1; return count; },{});
-  
   let result = remapObject(commonGenres);
 
   result.sort((itemA, itemB)=>(itemB.count - itemA.count));
-  if (result.length > 5) result.length = 5;
+  if (result.length > 5) result.length = 5; // maybe use slice.
   
   return result;
 }
@@ -67,16 +63,11 @@ function getMostPopularAuthors(books, authors)
 
   let commonAuthors = books.reduce(function(count,book){count[book.authorId] = (count[book.authorId] || 0) + book.borrows.length; return count; },{});
 
-  const keys=Object.keys(commonAuthors);
-  const values=Object.values(commonAuthors);
   const result = [];
-  for (let i=0; i<keys.length;i++)
+  for (const key in commonAuthors)
   {
-    let object ={};
-    const anAuthor = authors.find((author)=> parseInt(keys[i]) === author.id);
-    object.name = anAuthor.name.first + " " + anAuthor.name.last;
-    object.count = values[i];
-    result.push(object);
+    const anAuthor = authors.find((author)=> key == author.id);
+    result.push({name: anAuthor.name.first + " " + anAuthor.name.last, count: commonAuthors[key]});
   }
 
   result.sort((itemA, itemB)=>(itemB.count - itemA.count));
